@@ -1,0 +1,99 @@
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: workload-ping-echo
+  labels:
+    name: workload-ping-echo
+    istio-injection: enabled
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: echo
+  namespace: workload-ping-echo
+  labels:
+    app: echo
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: echo
+
+  template:
+    metadata:
+      labels:
+        app: echo
+
+    spec:
+      containers:
+      - name: echo
+        image: ghcr.io/arthursimas1/python-ping-echo:0.1.0
+        imagePullPolicy: Always
+        command:
+        - /sock_tcp_server.py
+        args:
+        - "0.0.0.0:45678"
+        ports:
+        - containerPort: 45678
+
+---
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: echo
+  namespace: workload-ping-echo
+
+spec:
+  type: ClusterIP
+  selector:
+    app: echo
+  ports:
+  - protocol: TCP
+    port: 45678
+    targetPort: 45678
+    appProtocol: tcp
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ping
+  namespace: workload-ping-echo
+  labels:
+    app: ping
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: ping
+
+  template:
+    metadata:
+      labels:
+        app: ping
+
+    spec:
+      containers:
+      - name: ping
+        image: ghcr.io/arthursimas1/python-ping-echo:0.1.0
+        imagePullPolicy: Always
+        command:
+        - /sock_tcp_client.py
+        args:
+        - "echo:45678"
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
