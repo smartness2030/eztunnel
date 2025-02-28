@@ -1,3 +1,7 @@
+> Archived repository. [eSeMeshA](https://github.com/smartness2030/eSeMeshA) is the up-to-date version of this project.
+
+---
+
 # eZtunnel 🐝
 
 **eZtunnel** is a transparent eBPF-based offloading for service mesh communication designed to mitigate networking overheads in intra-node service mesh communication. The method employs an in-kernel method to bypass costly data paths, while maintaining full support for modern service mesh architectures, like Istio Ambient Mesh, and sidecar-based approaches.
